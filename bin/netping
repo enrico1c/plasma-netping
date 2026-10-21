@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Layered connectivity check: NetworkManager state + HTTP probe (no ICMP).
+# Output: "<n>ms" | PORTAL | LIMITED | DOWN. Probes at most every 12 s (cached),
+# so the widget can keep polling every 5 s.
+cache="${XDG_RUNTIME_DIR:-/tmp}/netping.cache"
+if [ -f "$cache" ] && [ $(( $(date +%s) - $(stat -c %Y "$cache") )) -lt 12 ]; then
+    cat "$cache"; exit 0
+fi
+
+state=$(nmcli networking connectivity check 2>/dev/null)   # full|limited|portal|none|unknown
+read -r code conn < <(curl -s -m3 -o /dev/null -w '%{http_code} %{time_connect}' \
+    http://www.gstatic.com/generate_204 2>/dev/null)
+
+if   [ "$state" = none ];    then out=DOWN
+elif [ "$state" = portal ];  then out=PORTAL
+elif [ "$code" = 204 ];      then out=$(awk -v t="$conn" 'BEGIN{printf "%.0fms", t*1000}')
+elif [ "$code" = 000 ] || [ -z "$code" ]; then
+    [ "$state" = limited ] && out=LIMITED || out=DOWN
+else out=PORTAL    # got a non-204 HTTP answer: something is intercepting
+fi
+echo "$out" | tee "$cache"

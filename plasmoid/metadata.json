@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Id": "local.netping",
+        "Name": "Net Ping",
+        "Icon": "network-wireless"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

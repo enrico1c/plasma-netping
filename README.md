@@ -17,3 +17,7 @@ cp -r plasmoid ~/.local/share/plasma/plasmoids/local.netping
 Then add "Net Ping" to a panel. The script path is hardcoded in `plasmoid/contents/ui/main.qml` (`$HOME/bin/netping`, run through the shell); edit it if you install the script elsewhere.
 
 Needs: NetworkManager (`nmcli`), `curl`, `awk`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
